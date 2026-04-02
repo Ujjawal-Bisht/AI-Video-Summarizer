@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <div class="brand">
+          <div class="logo">VS</div>
+          <div>
+            <div class="title">Video Summarizer</div>
+            <div class="subtitle">Paste a YouTube link → get a clean Markdown summary.</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="card">
+        <form method="post" action="/summarize" class="form">
+          <label class="label" for="url">YouTube URL</label>
+          <div class="row">
+            <input
+              id="url"
+              name="url"
+              class="input"
+              placeholder="https://www.youtube.com/watch?v=KgolhE7p-KY"
+              value="{{ url }}"
+              required
+            />
+            <button class="button" type="submit">Summarize</button>
+          </div>
+        </form>
+
+        {% if error %}
+          <div class="alert alert-error">
+            <div class="alert-title">Error</div>
+            <div class="alert-body">{{ error }}</div>
+          </div>
+        {% endif %}
+
+        {% if summary %}
+          <div class="result">
+            <div class="result-head">
+              <div>
+                <div class="result-title">Summary (Markdown)</div>
+                <div class="result-subtitle">Copy into Notion or any Markdown editor.</div>
+              </div>
+              <button class="button button-secondary" type="button" id="copyBtn">Copy</button>
+            </div>
+            <textarea class="output" id="summaryBox" readonly>{{ summary }}</textarea>
+          </div>
+        {% endif %}
+      </section>
+
+      <footer class="footer">
+        Built with Flask + YouTube Transcript API + Gemini by UB.
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        const copyBtn = document.getElementById("copyBtn");
+        const box = document.getElementById("summaryBox");
+        if (!copyBtn || !box) return;
+
+        copyBtn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(box.value);
+            copyBtn.textContent = "Copied";
+            setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
+          } catch (e) {
+            copyBtn.textContent = "Copy failed";
+            setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
